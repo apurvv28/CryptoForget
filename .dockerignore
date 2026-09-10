@@ -1,0 +1,10 @@
+data/
+results/
+scripts/
+.git/
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.ipynb
+results/figures/
