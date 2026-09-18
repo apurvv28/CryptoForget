@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 
 class ClickEvent(BaseModel):
     """A single observed click, fed in live (e.g. from Kafka/Redis stream
-    consumer, or Anushka/Nisha/Vedant's simulated user-interaction feed)."""
+    consumer, or simulated user-interaction feed)."""
 
     user_id: str
     news_id: str

@@ -5,13 +5,12 @@ This is the "training" step. It does NOT train a classic weighted model —
 the content model is a TF-IDF representation of the news corpus, plus a
 lookup of each known user's long-term (historical) click list.
 
-Anushka's retraining pipeline should re-run this script whenever the news
-catalog / interaction data is refreshed, then hot-swap the two .joblib
-files produced here. The FastAPI service only ever reads these files.
+Re-run this script whenever the news catalog / interaction data is refreshed,
+then hot-swap the two .joblib files produced in the models/ directory.
 
 Usage:
     python scripts/build_content_model.py \
-        --data-dir ../data/raw/MINDsmall_train \
+        --data-dir data/raw/MINDsmall_train \
         --output-dir models
 """
 
@@ -22,8 +21,9 @@ from pathlib import Path
 import joblib
 
 # Make the project's `src` package importable regardless of cwd.
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(PROJECT_ROOT))
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.data.loader import load_mind
 from src.data.user_history import build_user_histories
@@ -67,7 +67,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--output-dir",
-        default=str(Path(__file__).resolve().parents[1] / "models"),
+        default=str(PROJECT_ROOT / "models"),
         help="Directory to write content_model.joblib and user_histories.joblib",
     )
     parser.add_argument("--max-features", type=int, default=20000)

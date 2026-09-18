@@ -713,6 +713,39 @@ results/figures/
 
 ---
 
+## Model Serving API
+
+The dynamic recommendation model can be served as a FastAPI REST service directly from the repository root.
+
+### Build Model Artifacts
+
+```powershell
+python .\scripts\build_content_model.py --data-dir data/raw/MINDsmall_train --output-dir models
+```
+
+### Launch the Serving API
+
+```powershell
+uvicorn main:app --reload
+```
+
+Interactive API documentation will be available at [http://localhost:8000/docs](http://localhost:8000/docs).
+
+### API Endpoints
+
+- `GET /health` — Health and model status check.
+- `POST /clicks` — Ingest single user click event.
+- `POST /recommend` — Rank candidate news IDs for a user.
+
+### Run with Docker
+
+```bash
+docker build -t crypto-forget .
+docker run -p 8000:8000 crypto-forget
+```
+
+---
+
 # 18. Reproducibility
 
 The project uses a fixed experimental configuration for the primary dynamic model:

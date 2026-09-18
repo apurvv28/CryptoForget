@@ -7,9 +7,10 @@ from typing import Dict, List, Optional
 import joblib
 import pandas as pd
 
-# Make the project's `src` package importable inside the container.
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(PROJECT_ROOT))
+# Make the project's `src` package importable
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.models.dynamic_recommender import DynamicRecommender
 from src.personalization.history_profile import EventDynamicProfileBuilder
@@ -19,7 +20,7 @@ MODEL_VERSION = os.getenv("MODEL_VERSION", "dev")
 MODELS_DIR = Path(
     os.getenv(
         "MODELS_DIR",
-        str(Path(__file__).resolve().parents[1] / "models"),
+        str(PROJECT_ROOT / "models"),
     )
 )
 
@@ -39,8 +40,8 @@ class RecommenderService:
         if not content_model_path.exists():
             raise FileNotFoundError(
                 f"{content_model_path} not found. Run "
-                "scripts/build_content_model.py first (or mount the "
-                "models/ volume) before starting the API."
+                "scripts/build_content_model.py first (or place the "
+                "models/*.joblib files in models/) before starting the API."
             )
 
         self.content_model = joblib.load(content_model_path)
@@ -60,9 +61,7 @@ class RecommenderService:
 
         self.recommender = DynamicRecommender(content_model=self.content_model)
 
-        # In-memory live click store. In production this would be backed by
-        # Redis/Kafka state (Anushka's streaming layer) instead of RAM, but
-        # the interface below stays the same either way.
+        # In-memory live click store.
         self.click_store = UserClickStore()
 
     def record_click(self, user_id: str, news_id: str, time: Optional[datetime]) -> int:

@@ -1,6 +1,13 @@
+import os
+from pathlib import Path
+
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 from app.model_state import MODEL_VERSION, get_service
+from app.routers import auditor, news, unlearning, users
 from app.schemas import (
     ClickAck,
     ClickEvent,
@@ -8,21 +15,49 @@ from app.schemas import (
     RecommendRequest,
     RecommendResponse,
 )
+from src.db.database import init_db
 
 app = FastAPI(
-    title="CryptoForget Recommendation Service",
+    title="CryptoForget — Verifiable Machine Unlearning Platform API",
     description=(
-        "Serves the dynamic (long-term + short-term) content-based news "
-        "recommendation model over HTTP."
+        "Production REST framework integrating sharded SISA machine unlearning, "
+        "Merkle exclusion proofs, ECDSA deletion certificates, and append-only audit logging."
     ),
     version=MODEL_VERSION,
 )
 
+# Enable CORS for React frontend dashboard
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Register API Routers
+app.include_router(news.router)
+app.include_router(users.router)
+app.include_router(unlearning.router)
+app.include_router(auditor.router)
+
+# Mount static frontend build if present
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+FRONTEND_DIST = PROJECT_ROOT / "frontend" / "dist"
+
+if FRONTEND_DIST.exists():
+    app.mount("/assets", StaticFiles(directory=FRONTEND_DIST / "assets"), name="static_assets")
+
+    @app.get("/", include_in_schema=False)
+    def serve_frontend_dashboard():
+        return FileResponse(FRONTEND_DIST / "index.html")
+
 
 @app.on_event("startup")
-def load_model() -> None:
-    # Fails fast at container startup if artifacts are missing, instead of
-    # failing on the first request.
+def startup_event() -> None:
+    # Initialize database tables
+    init_db()
+    # Pre-load recommendation model service
     get_service()
 
 
