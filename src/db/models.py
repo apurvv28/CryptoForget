@@ -1,5 +1,5 @@
 import json
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, Optional
 
 from sqlalchemy import (
@@ -15,9 +15,18 @@ from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
 
+IST = timezone(timedelta(hours=5, minutes=30))
+
+
+def ist_now() -> datetime:
+    return datetime.now(IST)
+
 
 def utc_now() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(IST)
+
+
+default_utc_now = utc_now
 
 
 class User(Base):
@@ -38,7 +47,7 @@ class UserInteractionRecord(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(String(64), ForeignKey("users.user_id"), nullable=False, index=True)
     news_id = Column(String(64), nullable=False, index=True)
-    timestamp = Column(DateTime(timezone=True), default_utc_now, nullable=False)
+    timestamp = Column(DateTime(timezone=True), default=utc_now, nullable=False)
     shard_id = Column(Integer, nullable=False, index=True)
     leaf_hash = Column(String(64), nullable=False, index=True)
 
@@ -110,11 +119,14 @@ class DeletionCertificate(Base):
     request = relationship("DeletionRequest", back_populates="certificate")
 
     def to_dict(self) -> Dict[str, Any]:
+        ts = self.created_at.isoformat() if self.created_at else None
         return {
             "certificate_id": self.certificate_id,
             "request_id": self.request_id,
             "user_id": self.user_id,
             "deletion_type": self.deletion_type,
+            "timestamp": ts,
+            "created_at": ts,
             "old_merkle_root": self.old_merkle_root,
             "new_merkle_root": self.new_merkle_root,
             "merkle_exclusion_proof": json.loads(self.merkle_exclusion_proof_json or "{}"),
@@ -122,5 +134,4 @@ class DeletionCertificate(Base):
             "new_model_hash": self.new_model_hash,
             "ecdsa_signature": self.ecdsa_signature,
             "issuer_public_key_pem": self.issuer_public_key_pem,
-            "created_at": self.created_at.isoformat() if self.created_at else None,
         }

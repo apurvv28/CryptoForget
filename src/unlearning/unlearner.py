@@ -1,7 +1,7 @@
 import hashlib
 import json
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, Optional, Tuple
 
 from sqlalchemy.orm import Session
@@ -12,6 +12,8 @@ from src.crypto.merkle import MerkleTree, compute_leaf_hash
 from src.db.models import DeletionCertificate, DeletionRequest, User, UserInteractionRecord
 from src.unlearning.mia import MembershipInferenceAttackHarness
 from src.unlearning.sharded_trainer import ShardedRecommenderEnsemble
+
+IST = timezone(timedelta(hours=5, minutes=30))
 
 
 class UnlearningEngine:
@@ -86,14 +88,14 @@ class UnlearningEngine:
             self.ensemble.partitioner.remove_user(user_id)
             del_req.affected_shards = [affected_shard_id]
             del_req.status = "completed"
-            del_req.completed_at = datetime.now(timezone.utc)
+            del_req.completed_at = datetime.now(IST)
             retrain_ms = 0.0
         else:
             # Path B: Post-training SISA Shard Retraining
             affected_shard_id, retrain_ms, _ = self.ensemble.unlearn_user_post_training(user_id)
             del_req.affected_shards = [affected_shard_id]
             del_req.status = "completed"
-            del_req.completed_at = datetime.now(timezone.utc)
+            del_req.completed_at = datetime.now(IST)
 
         session.commit()
 

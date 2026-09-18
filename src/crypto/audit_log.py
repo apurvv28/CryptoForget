@@ -1,19 +1,22 @@
 import hashlib
-from datetime import datetime, timezone
+import json
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
 from sqlalchemy.orm import Session
 
 from src.db.models import AuditLogEntry
 
+IST = timezone(timedelta(hours=5, minutes=30))
+
 
 def format_timestamp(ts: Optional[datetime]) -> str:
-    """Formats datetime deterministically to ISO 8601 UTC string."""
+    """Formats datetime deterministically to ISO 8601 IST string (+05:30)."""
     if ts is None:
         return ""
     if ts.tzinfo is None:
-        ts = ts.replace(tzinfo=timezone.utc)
-    return ts.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        ts = ts.replace(tzinfo=IST)
+    return ts.astimezone(IST).strftime("%Y-%m-%dT%H:%M:%S+05:30")
 
 
 def compute_block_hash(prev_hash: str, action: str, payload_hash: str, timestamp_str: str) -> str:
@@ -40,7 +43,7 @@ class AuditLedger:
         )
         prev_hash = last_block.curr_hash if last_block else "0" * 64
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(IST)
         now_str = format_timestamp(now)
 
         curr_hash = compute_block_hash(prev_hash, action, payload_hash, now_str)

@@ -263,7 +263,7 @@ export default function AuditorPortal({ externalCertToVerify }) {
                 {auditData.blocks.map((block) => (
                   <tr key={block.block_id} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
                     <td style={{ padding: '12px', fontWeight: '700', color: '#818cf8' }}>#{block.block_id}</td>
-                    <td style={{ padding: '12px', color: 'var(--text-muted)' }}>{block.timestamp ? new Date(block.timestamp).toLocaleTimeString() : 'N/A'}</td>
+                    <td style={{ padding: '12px', color: 'var(--text-muted)' }}>{block.timestamp ? new Date(block.timestamp).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', hour12: true }) + ' IST' : 'N/A'}</td>
                     <td style={{ padding: '12px', fontWeight: '600', color: '#10b981' }}>{block.action}</td>
                     <td style={{ padding: '12px' }}>
                       {block.metrics ? (

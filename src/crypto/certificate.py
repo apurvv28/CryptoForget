@@ -1,11 +1,13 @@
 import json
 import time
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, Optional, Tuple
 
 from src.crypto.ecdsa_signer import ECDSAService, get_ecdsa_service
 from src.crypto.merkle import verify_merkle_proof
+
+IST = timezone(timedelta(hours=5, minutes=30))
 
 
 def canonical_certificate_payload(
@@ -48,7 +50,7 @@ def generate_deletion_certificate(
     """Generates an independently verifiable ECDSA signed deletion certificate."""
     signer = ecdsa_service or get_ecdsa_service()
     certificate_id = f"CERT-{uuid.uuid4().hex[:12].upper()}"
-    timestamp_str = datetime.now(timezone.utc).isoformat()
+    timestamp_str = datetime.now(IST).isoformat()
 
     payload_to_sign = canonical_certificate_payload(
         certificate_id=certificate_id,
@@ -97,22 +99,24 @@ def verify_deletion_certificate(
         elapsed_ms = (time.perf_counter() - start_time) * 1000
         return False, "Public key missing in certificate or arguments.", elapsed_ms
 
+    timestamp_str = certificate_dict.get("timestamp") or certificate_dict.get("created_at") or ""
+
     payload_to_verify = canonical_certificate_payload(
-        certificate_id=certificate_dict["certificate_id"],
-        request_id=certificate_dict["request_id"],
-        user_id=certificate_dict["user_id"],
-        deletion_type=certificate_dict["deletion_type"],
-        old_merkle_root=certificate_dict["old_merkle_root"],
-        new_merkle_root=certificate_dict["new_merkle_root"],
-        old_model_hash=certificate_dict["old_model_hash"],
-        new_model_hash=certificate_dict["new_model_hash"],
-        timestamp_str=certificate_dict["timestamp"],
+        certificate_id=certificate_dict.get("certificate_id", ""),
+        request_id=certificate_dict.get("request_id", ""),
+        user_id=certificate_dict.get("user_id", ""),
+        deletion_type=certificate_dict.get("deletion_type", ""),
+        old_merkle_root=certificate_dict.get("old_merkle_root", ""),
+        new_merkle_root=certificate_dict.get("new_merkle_root", ""),
+        old_model_hash=certificate_dict.get("old_model_hash", ""),
+        new_model_hash=certificate_dict.get("new_model_hash", ""),
+        timestamp_str=timestamp_str,
     )
 
     # 1. Verify ECDSA Digital Signature
     is_signature_valid = ECDSAService.verify_signature(
         payload=payload_to_verify,
-        signature_b64=certificate_dict["ecdsa_signature"],
+        signature_b64=certificate_dict.get("ecdsa_signature", ""),
         public_key_pem=public_key_pem,
     )
 
