@@ -155,6 +155,7 @@ class UnlearningEngine:
             request_id=request_id,
             user_id=user_id,
             deletion_type=request_type,
+            timestamp_str=cert_dict["timestamp"],
             old_merkle_root=old_root,
             new_merkle_root=new_root,
             merkle_exclusion_proof_json=json.dumps(exclusion_proof),

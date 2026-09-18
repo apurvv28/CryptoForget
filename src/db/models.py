@@ -107,6 +107,7 @@ class DeletionCertificate(Base):
     request_id = Column(String(64), ForeignKey("deletion_requests.request_id"), nullable=False, unique=True)
     user_id = Column(String(64), nullable=False, index=True)
     deletion_type = Column(String(16), nullable=False)
+    timestamp_str = Column(String(64), nullable=True)
     old_merkle_root = Column(String(64), nullable=False)
     new_merkle_root = Column(String(64), nullable=False)
     merkle_exclusion_proof_json = Column(Text, nullable=False)
@@ -119,7 +120,7 @@ class DeletionCertificate(Base):
     request = relationship("DeletionRequest", back_populates="certificate")
 
     def to_dict(self) -> Dict[str, Any]:
-        ts = self.created_at.isoformat() if self.created_at else None
+        ts = self.timestamp_str or (self.created_at.strftime("%Y-%m-%dT%H:%M:%S+05:30") if self.created_at else None)
         return {
             "certificate_id": self.certificate_id,
             "request_id": self.request_id,

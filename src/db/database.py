@@ -35,6 +35,9 @@ def init_db() -> None:
             if "issuer_public_key_pem" not in cols:
                 conn.execute(text("ALTER TABLE deletion_certificates ADD COLUMN issuer_public_key_pem TEXT"))
                 conn.commit()
+            if "timestamp_str" not in cols:
+                conn.execute(text("ALTER TABLE deletion_certificates ADD COLUMN timestamp_str TEXT"))
+                conn.commit()
         except Exception:
             pass
 

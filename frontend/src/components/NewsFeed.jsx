@@ -8,19 +8,21 @@ const API_BASE = 'http://localhost:8000';
 
 const CATEGORIES = ['All', 'news', 'sports', 'finance', 'entertainment', 'lifestyle', 'travel'];
 
-export default function NewsFeed({ currentUser, onArticleClicked }) {
+export default function NewsFeed({ currentUser, onArticleClicked, onUserUpdated }) {
   const [articles, setArticles] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [newsSourceMode, setNewsSourceMode] = useState('live'); // 'live' or 'mind'
   const [loadingNews, setLoadingNews] = useState(false);
   const [loadingRecs, setLoadingRecs] = useState(false);
+  const [resettingUsers, setResettingUsers] = useState(false);
   const [activeArticle, setActiveArticle] = useState(null);
   const [clickMessage, setClickMessage] = useState('');
 
   // Fetch News Catalog
   useEffect(() => {
-    fetchNewsCatalog(selectedCategory);
-  }, [selectedCategory]);
+    fetchNewsCatalog(selectedCategory, newsSourceMode);
+  }, [selectedCategory, newsSourceMode]);
 
   // Fetch Recommendations for active user
   useEffect(() => {
@@ -29,12 +31,15 @@ export default function NewsFeed({ currentUser, onArticleClicked }) {
     } else {
       setRecommendations([]);
     }
-  }, [currentUser, selectedCategory]);
+  }, [currentUser, selectedCategory, newsSourceMode]);
 
-  const fetchNewsCatalog = async (cat) => {
+  const fetchNewsCatalog = async (cat, sourceMode) => {
     setLoadingNews(true);
     try {
-      const url = `${API_BASE}/api/v1/news?limit=12&category=${cat === 'All' ? '' : cat}`;
+      let url = `${API_BASE}/api/v1/news?limit=15&category=${cat === 'All' ? '' : cat}`;
+      if (sourceMode === 'live') {
+        url = `${API_BASE}/api/v1/news/live?limit=25&category=${cat === 'All' ? '' : cat}`;
+      }
       const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
@@ -44,6 +49,24 @@ export default function NewsFeed({ currentUser, onArticleClicked }) {
       console.error('Failed to fetch news catalog:', err);
     } finally {
       setLoadingNews(false);
+    }
+  };
+
+  const handleResetAllDeletions = async () => {
+    setResettingUsers(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/users/reset-all-deletions`, {
+        method: 'POST',
+      });
+      if (res.ok) {
+        if (onUserUpdated) onUserUpdated();
+        if (onArticleClicked) onArticleClicked();
+        fetchRecommendations();
+      }
+    } catch (err) {
+      console.error('Failed to reset user deletions:', err);
+    } finally {
+      setResettingUsers(false);
     }
   };
 
@@ -108,6 +131,74 @@ export default function NewsFeed({ currentUser, onArticleClicked }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
       
+      {/* Top Banner: News Source Toggle & Reset All Deletions Action */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>
+        
+        {/* Source Mode Toggle */}
+        <div style={{ display: 'flex', gap: '8px', background: '#111827', padding: '4px', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+          <button
+            onClick={() => setNewsSourceMode('live')}
+            style={{
+              padding: '8px 16px',
+              borderRadius: '8px',
+              border: 'none',
+              background: newsSourceMode === 'live' ? 'linear-gradient(135deg, #10b981 0%, #06b6d4 100%)' : 'transparent',
+              color: newsSourceMode === 'live' ? '#090d16' : 'var(--text-muted)',
+              fontSize: '13px',
+              fontWeight: '700',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}
+          >
+            <Sparkles size={14} /> Real-Time Live News Feed (RSS)
+          </button>
+
+          <button
+            onClick={() => setNewsSourceMode('mind')}
+            style={{
+              padding: '8px 16px',
+              borderRadius: '8px',
+              border: 'none',
+              background: newsSourceMode === 'mind' ? 'linear-gradient(135deg, #6366f1 0%, #818cf8 100%)' : 'transparent',
+              color: newsSourceMode === 'mind' ? '#fff' : 'var(--text-muted)',
+              fontSize: '13px',
+              fontWeight: '700',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}
+          >
+            <BookOpen size={14} /> MIND Dataset Catalog
+          </button>
+        </div>
+
+        {/* Undo All Deletions Button */}
+        <button
+          onClick={handleResetAllDeletions}
+          disabled={resettingUsers}
+          style={{
+            padding: '10px 18px',
+            borderRadius: '10px',
+            background: 'rgba(16, 185, 129, 0.15)',
+            color: '#10b981',
+            border: '1px solid rgba(16, 185, 129, 0.4)',
+            fontSize: '13px',
+            fontWeight: '700',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}
+        >
+          {resettingUsers ? <RefreshCw className="animate-spin" size={16} /> : <CheckCircle2 size={16} />}
+          Undo All Deletions & Enable Consent for All Users
+        </button>
+
+      </div>
+
       {/* Category Filter Pills */}
       <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '4px' }}>
         {CATEGORIES.map((cat) => (
@@ -138,7 +229,7 @@ export default function NewsFeed({ currentUser, onArticleClicked }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <Sparkles size={22} color="#818cf8" />
             <h2 style={{ fontSize: '18px', fontWeight: '700' }} className="gradient-text">
-              Personalized News Feed for {currentUser?.name || 'You'}
+              Personalized News Feed for {currentUser?.name || 'You'} ({newsSourceMode === 'live' ? 'Live RSS Mode' : 'MIND Dataset'})
             </h2>
           </div>
 
@@ -208,7 +299,7 @@ export default function NewsFeed({ currentUser, onArticleClicked }) {
       {/* Explore Main News Grid */}
       <div>
         <h3 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '16px', color: '#f3f4f6' }}>
-          Explore Latest News ({articles.length} Articles)
+          Explore {newsSourceMode === 'live' ? 'Real-Time Live' : 'Latest'} News ({articles.length} Articles)
         </h3>
 
         {loadingNews ? (

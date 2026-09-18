@@ -69,6 +69,19 @@ class NewsContentModel:
 
         return self.news_vectors[index]
 
+    def add_dynamic_article(self, news_id: str, title: str, abstract: str):
+        """Vectorizes and indexes dynamic real-time news articles on the fly."""
+        if news_id in self.news_id_to_index:
+            return
+
+        text_content = f"{title or ''} {abstract or ''}"
+        vector = self.vectorizer.transform([text_content])
+
+        if self.news_vectors is not None:
+            from scipy import sparse
+            self.news_vectors = sparse.vstack([self.news_vectors, vector])
+            self.news_id_to_index[news_id] = self.news_vectors.shape[0] - 1
+
     def get_dimension(self):
         """
         Return dimensionality of the news representation.

@@ -89,6 +89,14 @@ class UserAgentPopulationManager:
             agent.is_unlearned = True
             agent.click_history = []
 
+    def reset_all_agents(self) -> None:
+        """Restores consent status and undoes deletion state for all virtual user agents."""
+        for agent in self.agents.values():
+            agent.consent_status = True
+            agent.is_unlearned = False
+            if not agent.click_history:
+                agent.click_history = [f"N{random.randint(10000, 20000)}" for _ in range(3)]
+
 
 # Singleton population manager
 _agent_manager_instance = None

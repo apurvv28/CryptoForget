@@ -50,7 +50,7 @@ def generate_deletion_certificate(
     """Generates an independently verifiable ECDSA signed deletion certificate."""
     signer = ecdsa_service or get_ecdsa_service()
     certificate_id = f"CERT-{uuid.uuid4().hex[:12].upper()}"
-    timestamp_str = datetime.now(IST).isoformat()
+    timestamp_str = datetime.now(IST).strftime("%Y-%m-%dT%H:%M:%S+05:30")
 
     payload_to_sign = canonical_certificate_payload(
         certificate_id=certificate_id,
