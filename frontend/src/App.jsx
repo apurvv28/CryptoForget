@@ -31,7 +31,7 @@ export default function App() {
     try {
       const res = await fetch(`${API_BASE}/health`);
       setApiOnline(res.ok);
-    } catch (err) {
+    } catch {
       setApiOnline(false);
     }
   };

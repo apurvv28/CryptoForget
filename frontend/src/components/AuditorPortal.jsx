@@ -69,7 +69,7 @@ export default function AuditorPortal({ externalCertToVerify }) {
           verification_time_ms: 0.0
         });
       }
-    } catch (err) {
+    } catch {
       setVerificationResult({
         is_valid: false,
         message: 'Invalid JSON format or malformed certificate.',

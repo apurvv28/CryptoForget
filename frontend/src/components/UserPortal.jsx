@@ -10,7 +10,6 @@ export default function UserPortal({ onSelectCertificate }) {
   const [agents, setAgents] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState('U1000');
   const [currentAgent, setCurrentAgent] = useState(null);
-  const [candidates, setCandidates] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
   const [loadingRecs, setLoadingRecs] = useState(false);
   const [deletionType, setDeletionType] = useState('Path B');
@@ -65,8 +64,6 @@ export default function UserPortal({ onSelectCertificate }) {
       'N10001', 'N10002', 'N10003', 'N10004', 'N10005',
       'N10006', 'N10007', 'N10008', 'N10009', 'N10010'
     ];
-    setCandidates(sampleCandidates);
-
     try {
       const res = await fetch(`${API_BASE}/recommend`, {
         method: 'POST',
@@ -85,7 +82,7 @@ export default function UserPortal({ onSelectCertificate }) {
         const errData = await res.json();
         setErrorMessage(errData.detail || 'Failed to generate recommendations.');
       }
-    } catch (err) {
+    } catch {
       setErrorMessage('Backend API unreachable. Ensure uvicorn main:app is running.');
     } finally {
       setLoadingRecs(false);
@@ -137,7 +134,7 @@ export default function UserPortal({ onSelectCertificate }) {
         setErrorMessage(errData.detail || 'Unlearning execution failed.');
         setUnlearningStatus('idle');
       }
-    } catch (err) {
+    } catch {
       setErrorMessage('Error communicating with unlearning engine.');
       setUnlearningStatus('idle');
     }

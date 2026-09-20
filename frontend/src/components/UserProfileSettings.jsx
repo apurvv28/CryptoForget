@@ -6,7 +6,7 @@ import {
 
 const API_BASE = 'http://localhost:8000';
 
-export default function UserProfileSettings({ currentUser, onUserUpdated, onInspectCertificate }) {
+export default function UserProfileSettings({ currentUser, onUserUpdated }) {
   const [deletionType, setDeletionType] = useState('Path B');
   const [unlearningStatus, setUnlearningStatus] = useState('idle'); // idle, processing, completed
   const [unlearningStep, setUnlearningStep] = useState(0);
@@ -68,7 +68,7 @@ export default function UserProfileSettings({ currentUser, onUserUpdated, onInsp
         setErrorMessage(errData.detail || 'Unlearning execution failed.');
         setUnlearningStatus('idle');
       }
-    } catch (err) {
+    } catch {
       setErrorMessage('Communication error with unlearning backend.');
       setUnlearningStatus('idle');
     }
