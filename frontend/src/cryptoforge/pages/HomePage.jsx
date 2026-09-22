@@ -140,27 +140,6 @@ export default function HomePage() {
           </div>
         )}
 
-        {ranking.status === "ready" && meta && (
-          <div className="cf-signals">
-            <span
-              className={`cf-chip ${meta.usedLong ? "cf-chip--ok" : ""}`}
-              title="True when the model found a MIND click history for this user."
-            >
-              Long-term profile:{" "}
-              {meta.usedLong ? "history found" : "no history"}
-            </span>
-            <span
-              className={`cf-chip ${meta.usedShort ? "cf-chip--ok" : ""}`}
-              title="True when the backend holds clicks for this user. The model weights clicks from the last 24 hours."
-            >
-              Short-term signal:{" "}
-              {meta.usedShort ? "clicks recorded" : "none yet"}
-            </span>
-            <span className="cf-chip">Model {meta.modelVersion}</span>
-            <span className="cf-chip">{items.length} candidates ranked</span>
-          </div>
-        )}
-
         <section className="cf-section cf-section--first">
           <div className="cf-section-head">
             <h2>{personalized ? "Top picks for you" : "Top of the feed"}</h2>
@@ -188,11 +167,6 @@ export default function HomePage() {
     <div>
       <header className="cf-page-head">
         <h1>For you</h1>
-        <p>
-          Articles ranked by the dynamic long-term and short-term profile of{" "}
-          <strong>{userId}</strong>. Each open counts as a click the model can
-          learn from.
-        </p>
       </header>
 
       <div className="cf-toolbar">
