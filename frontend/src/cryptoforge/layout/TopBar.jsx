@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Icon from "../../components/Icon";
 import { navigate } from "../router/router";
 import { useApp } from "../state/AppState";
@@ -16,22 +16,37 @@ function initials(user, userId) {
 }
 
 export default function TopBar({ onMenu }) {
-  const { health, users, userId, setUserId, user } = useApp();
+  const { users, userId, setUserId, user } = useApp();
   const [q, setQ] = useState("");
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef(null);
+
+  const selectedUser = users.find((item) => item.user_id === userId) || user;
+  const selectedUserName = selectedUser?.name || "Demo user";
+
+  useEffect(() => {
+    const closeOnOutsideClick = (event) => {
+      if (!userMenuRef.current?.contains(event.target)) {
+        setUserMenuOpen(false);
+      }
+    };
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") setUserMenuOpen(false);
+    };
+
+    document.addEventListener("mousedown", closeOnOutsideClick);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("mousedown", closeOnOutsideClick);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, []);
 
   const submit = (e) => {
     e.preventDefault();
     const term = q.trim();
     if (term) navigate(`/explore?source=mind&q=${encodeURIComponent(term)}`);
   };
-
-  const status =
-    health.online === null ? "checking" : health.online ? "online" : "offline";
-  const statusLabel = {
-    checking: "Checking API",
-    online: "API online",
-    offline: "API offline",
-  }[status];
 
   return (
     <header className="cf-topbar">
@@ -56,41 +71,62 @@ export default function TopBar({ onMenu }) {
       </form>
 
       <div className="cf-topbar__right">
-        {health.data?.model_version && (
-          <span
-            className="cf-chip cf-topbar__model"
-            title="Model version reported by /health"
-          >
-            Model {health.data.model_version}
-          </span>
-        )}
-
-        <span className={`cf-status cf-status--${status}`}>
-          <span className="cf-status__dot" />
-          <span className="cf-status__text">{statusLabel}</span>
-        </span>
-
-        <label className="cf-persona">
+        <div className="cf-persona" ref={userMenuRef}>
           <span className="cf-avatar" aria-hidden="true">
             {initials(user, userId)}
           </span>
-          <span className="cf-persona__body">
-            <span className="cf-persona__label">Demo user</span>
-            <select
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
-              aria-label="Switch demo user"
-            >
-              {users.length === 0 && <option value={userId}>{userId}</option>}
-              {users.map((u) => (
-                <option key={u.user_id} value={u.user_id}>
-                  {u.user_id} · {u.name}
-                  {u.is_unlearned ? " (forgotten)" : ""}
-                </option>
-              ))}
-            </select>
-          </span>
-        </label>
+          <button
+            type="button"
+            className="cf-persona__trigger"
+            aria-haspopup="listbox"
+            aria-expanded={userMenuOpen}
+            onClick={() => setUserMenuOpen((open) => !open)}
+          >
+            <span className="cf-persona__body">
+              <span className="cf-persona__label">Demo user</span>
+              <span className="cf-persona__value">
+                {userId} - {selectedUserName}
+              </span>
+            </span>
+            <span className={`cf-persona__chevron${userMenuOpen ? " is-open" : ""}`} aria-hidden="true">
+              ▼
+            </span>
+          </button>
+
+          {userMenuOpen && (
+            <div className="cf-persona__menu" role="listbox" aria-label="Select demo user">
+              {users.length === 0 ? (
+                <button type="button" className="cf-persona__option is-selected" role="option" aria-selected="true">
+                  <span>{userId} - Demo user</span>
+                  <span aria-hidden="true">✓</span>
+                </button>
+              ) : (
+                users.map((item) => {
+                  const selected = item.user_id === userId;
+                  return (
+                    <button
+                      type="button"
+                      className={`cf-persona__option${selected ? " is-selected" : ""}`}
+                      key={item.user_id}
+                      role="option"
+                      aria-selected={selected}
+                      onClick={() => {
+                        setUserId(item.user_id);
+                        setUserMenuOpen(false);
+                      }}
+                    >
+                      <span>
+                        {item.user_id} - {item.name || "Demo user"}
+                        {item.is_unlearned ? " (forgotten)" : ""}
+                      </span>
+                      {selected && <span aria-hidden="true">✓</span>}
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );

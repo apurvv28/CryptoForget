@@ -2,7 +2,7 @@
 .cf-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 /* ===== My interests ===== */
-.cf-trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; align-items: start; }
+.cf-trio { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; align-items: start; }
 .cf-profile { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
 .cf-profile__tag { font-family: var(--cf-font-serif); font-size: 21px; font-weight: 600; }
 .cf-profile p { font-size: 14px; color: var(--cf-ink-2); }
@@ -77,11 +77,11 @@
 .cf-cmp .cf-fine { margin-top: 0; }
 
 /* ===== Responsive ===== */
-@media (max-width: 960px) {
-  .cf-trio { grid-template-columns: minmax(0, 1fr); }
-  .cf-finding h2 { font-size: 23px; }
+@media (min-width: 1024px) {
+  .cf-trio { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
-@media (max-width: 560px) {
+@media (max-width: 767px) {
+  .cf-finding h2 { font-size: clamp(1.35rem, 6vw, 1.75rem); }
   .cf-cmp__row { grid-template-columns: minmax(0, 1fr); gap: 6px; }
   .cf-cmp .cf-chip { justify-self: start; }
   .cf-catbars li { grid-template-columns: 90px minmax(0, 1fr) 28px; }
@@ -93,5 +93,5 @@
 .cf-topbar__right { flex: none; }
 @media (max-width: 560px) {
   .cf-persona { padding-right: 10px; }
-  .cf-persona select { max-width: 84px; }
+  .cf-persona__value { max-width: 42vw; }
 }

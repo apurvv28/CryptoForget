@@ -8,8 +8,8 @@
   margin-bottom: 18px;
 }
 .cf-toolbar .cf-search {
-  flex: 1 1 280px;
-  max-width: 460px;
+  flex: 1 1 100%;
+  max-width: 100%;
 }
 
 .cf-segmented {
@@ -21,7 +21,7 @@
   border-radius: 999px;
 }
 .cf-segmented button {
-  height: 34px;
+  min-height: 44px;
   padding: 0 16px;
   border: 0;
   border-radius: 999px;
@@ -46,7 +46,7 @@
 }
 .cf-pill {
   flex: none;
-  height: 34px;
+  min-height: 44px;
   padding: 0 16px;
   border-radius: 999px;
   cursor: pointer;
@@ -117,12 +117,12 @@
 /* ===== Grids ===== */
 .cf-grid-feature {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 20px;
 }
 .cf-grid-rows {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
 }
 
@@ -416,7 +416,7 @@
 }
 .cf-article {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
+  grid-template-columns: minmax(0, 1fr);
   gap: 32px;
   align-items: start;
 }
@@ -437,7 +437,7 @@
 .cf-article__title {
   font-family: var(--cf-font-serif);
   font-weight: 600;
-  font-size: 42px;
+  font-size: clamp(2rem, 8vw, 2.625rem);
   line-height: 1.1;
   letter-spacing: -0.015em;
   overflow-wrap: anywhere;
@@ -484,20 +484,19 @@
 }
 
 /* ===== Responsive ===== */
-@media (max-width: 1180px) {
+@media (min-width: 640px) {
   .cf-grid-feature {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+  .cf-grid-rows { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cf-toolbar .cf-search { flex-basis: 280px; max-width: 460px; }
 }
-@media (max-width: 960px) {
+@media (min-width: 768px) {
   .cf-article {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
   }
   .cf-article__aside {
     position: static;
-  }
-  .cf-article__title {
-    font-size: 32px;
   }
   .cf-article__abstract {
     font-size: 18px;
@@ -506,12 +505,11 @@
     font-size: 90px;
   }
 }
-@media (max-width: 640px) {
-  .cf-grid-feature,
-  .cf-grid-rows {
-    grid-template-columns: minmax(0, 1fr);
-  }
+@media (min-width: 1024px) {
+  .cf-grid-feature { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 767px) {
   .cf-section-head h2 {
-    font-size: 22px;
+    font-size: clamp(1.25rem, 6vw, 1.5rem);
   }
 }
