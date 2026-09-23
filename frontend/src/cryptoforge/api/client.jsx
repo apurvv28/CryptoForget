@@ -68,6 +68,9 @@ export const api = {
       params: { category, search, limit, offset, include_live: false },
       ...opts,
     }),
+  // Progressive image lookup for live articles: { images, pending, missing }
+  newsImages: (ids, opts) =>
+    request('/api/v1/news/images', { params: { ids: ids.join(',') }, ...opts }),
   getNews: (newsId, opts) => request(`/api/v1/news/${encodeURIComponent(newsId)}`, opts),
 
   // Recommendation model + interactions

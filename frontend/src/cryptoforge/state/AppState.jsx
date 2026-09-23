@@ -34,6 +34,7 @@ export function AppProvider({ children }) {
   const [clicks, setClicks] = useState([]);
   const [backendClickTotal, setBackendClickTotal] = useState(null);
   const articleCache = useRef(new Map());
+  const [articleImages, setArticleImages] = useState({});
 
   // ---- API health (poll) ----
   useEffect(() => {
@@ -146,18 +147,24 @@ export function AppProvider({ children }) {
   }, []);
   const getCachedArticle = useCallback((id) => articleCache.current.get(id), []);
 
+  // ---- Story images resolved after the list loaded (news_id -> image url) ----
+  const addArticleImages = useCallback((map) => {
+    setArticleImages((prev) => ({ ...prev, ...map }));
+  }, []);
+
   const value = useMemo(
     () => ({
       health, users, userId, setUserId, user, userError,
       refreshUser, refreshUsers,
       personalization, personalizationActive,
       clicks, backendClickTotal, recordClick, clearClickLog,
-      cacheArticles, getCachedArticle,
+      cacheArticles, getCachedArticle, articleImages, addArticleImages,
     }),
     [
       health, users, userId, setUserId, user, userError, refreshUser, refreshUsers,
       personalization, personalizationActive, clicks, backendClickTotal,
       recordClick, clearClickLog, cacheArticles, getCachedArticle,
+      articleImages, addArticleImages,
     ],
   );
 

@@ -4,6 +4,7 @@ from fastapi import APIRouter, HTTPException, Query
 
 from src.config import DATA_DIR
 from src.data.live_news import fetch_live_news_articles
+from src.data.news_imges import attach_cached_images, enrich_articles, image_state
 from src.data.loader import load_news
 
 router = APIRouter(prefix="/api/v1/news", tags=["News Catalog"])
@@ -32,6 +33,9 @@ def get_live_news(
     from app.model_state import get_service
 
     live_articles = fetch_live_news_articles(category=category, limit=limit)
+    # Resolve each story's own image. Waits a few seconds at most; the rest keeps
+    # resolving in the background and is served by GET /api/v1/news/images.
+    enrich_articles(live_articles, budget=3.5)
     svc = get_service()
 
     # Dynamically vectorize live articles into the TF-IDF recommendation model
@@ -51,6 +55,33 @@ def get_live_news(
     }
 
 
+@router.get("/images", response_model=Dict[str, Any])
+def get_news_images(
+    ids: str = Query(..., description="Comma-separated live news_ids (max 60)"),
+):
+    """Progressive image lookup for live articles the page already received.
+
+    Returns {images: {news_id: url}, pending: [news_id], missing: [news_id]}.
+    Poll until `pending` is empty. `missing` means no verified image exists and
+    the UI should keep its generated cover.
+    """
+    images: Dict[str, str] = {}
+    pending: List[str] = []
+    missing: List[str] = []
+    for news_id in [i.strip() for i in ids.split(",") if i.strip()][:60]:
+        article = _live_articles_store.get(news_id)
+        if article is None:
+            continue
+        state, url = image_state(article)
+        if state == "ready" and url:
+            images[news_id] = url
+        elif state == "pending":
+            pending.append(news_id)
+        else:
+            missing.append(news_id)
+    return {"images": images, "pending": pending, "missing": missing}
+
+
 @router.get("", response_model=Dict[str, Any])
 def list_news(
     category: Optional[str] = Query(None, description="Filter by category (e.g. news, sports, finance)"),
@@ -68,6 +99,7 @@ def list_news(
     if include_live:
         try:
             live_items = fetch_live_news_articles(category=category, limit=10)
+            enrich_articles(live_items, budget=2.0)
             svc = get_service()
             for item in live_items:
                 _live_articles_store[item["news_id"]] = item
@@ -106,6 +138,7 @@ def list_news(
                 "title": str(item.get("title", "")),
                 "abstract": str(item.get("abstract", "")),
                 "url": str(item.get("url", "")),
+                "image_url": None,  # MIND catalog has no images
                 "is_live": False,
             })
 
@@ -122,6 +155,7 @@ def get_news_article(news_id: str):
     """Retrieves details for a single news article (MIND catalog or Live RSS)."""
     if news_id in _live_articles_store:
         item = _live_articles_store[news_id]
+        enrich_articles([item], budget=4.0)
         return {
             "news_id": item["news_id"],
             "category": item.get("category", "General"),
@@ -129,6 +163,8 @@ def get_news_article(news_id: str):
             "title": item.get("title", ""),
             "abstract": item.get("abstract", ""),
             "url": item.get("url", ""),
+            "published_at": item.get("published_at", ""),
+            "image_url": item.get("image_url"),
             "is_live": True,
         }
 
@@ -145,5 +181,6 @@ def get_news_article(news_id: str):
         "title": str(row.get("title", "")),
         "abstract": str(row.get("abstract", "")),
         "url": str(row.get("url", "")),
+        "image_url": None,
         "is_live": False,
     }
