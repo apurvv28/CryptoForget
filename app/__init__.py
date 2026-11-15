@@ -1,1 +1,0 @@
-"""CryptoForget FastAPI Application Package."""

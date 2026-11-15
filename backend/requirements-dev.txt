@@ -1,0 +1,15 @@
+# CryptoForget Dev Dependencies
+
+-r requirements.txt
+
+# Dev tools
+ruff
+mypy
+pre-commit
+
+# Analysis
+pandas
+numpy
+scipy
+matplotlib
+jupyter

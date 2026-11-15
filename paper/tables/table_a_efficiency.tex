@@ -1,0 +1,18 @@
+\begin{table*}[t]
+\centering
+\small
+\caption{Main Efficiency Evaluation: SISA Selective Unlearning vs. Clean Full Retraining (M1) on DistilGPT2 (82M) across Configurations.}
+\label{tab:efficiency}
+\begin{tabular}{lcccccccc}
+\toprule
+\textbf{Method} & \textbf{Shards ($K$)} & \textbf{Slices ($S$)} & \textbf{$T_{\text{init}}$ (min)} & \textbf{$T_{\text{del}}$ (min)} & \textbf{$T_{\text{total}}$ (min)} & \textbf{Speedup} & \textbf{Time Saved (\%)} & \textbf{Break-even ($N$)} \\
+\midrule
+M1 Clean Full Retrain & --- & --- & --- & 0.155 & 0.155 & 1.00$\times$ & 0.0\% & --- \\
+SISA $2\times2$ & 2 & 2 & 0.225 & 0.023 & 0.023 & \textbf{6.62$\times$} & \textbf{84.89\%} & \textbf{1.7} \\
+SISA $2\times3$ & 2 & 3 & 0.445 & 0.040 & 0.040 & 3.89$\times$ & 74.28\% & 3.9 \\
+SISA $4\times2$ & 4 & 2 & 0.445 & 0.034 & 0.034 & 4.49$\times$ & 77.72\% & 3.7 \\
+SISA $4\times3$ & 4 & 3 & 0.687 & 0.039 & 0.039 & 3.94$\times$ & 74.59\% & 5.9 \\
+SISA $2\times5$ & 2 & 5 & 0.614 & 0.082 & 0.082 & 1.89$\times$ & 47.09\% & 8.4 \\
+\bottomrule
+\end{tabular}
+\end{table*}

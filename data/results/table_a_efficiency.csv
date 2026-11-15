@@ -1,0 +1,7 @@
+Method,Shards,Slices,Initial train (min),Deletion train (min),End-to-end deletion (min),Speedup,Time saved (%),Break-even (reqs)
+M1 Clean Full Retrain,-,-,-,0.14,0.14,1.00x,0.0%,-
+SISA 2x2,2,2,0.234,0.022,0.022,6.42x,84.43%,2.0
+SISA 2x3,2,3,0.313,0.047,0.047,2.98x,66.47%,3.4
+SISA 4x2,4,2,0.31,0.035,0.035,4.0x,75.02%,3.0
+SISA 4x3,4,3,0.413,0.041,0.041,3.4x,70.59%,4.2
+SISA 2x5,2,5,0.464,0.08,0.08,1.74x,42.69%,7.8

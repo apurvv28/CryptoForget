@@ -1,0 +1,10 @@
+{
+  "keys": [
+    {
+      "key_id": "key_2026_01",
+      "algorithm": "Ed25519",
+      "public_key_b64": "LgFW0GlK7Mz1YTELqUVsat6gKT6RuMUJm6iicwWHbBY=",
+      "status": "active"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "model_version": "v1.0.del-del_233e",
+  "model_type": "sisa_ensemble",
+  "num_shards": 2,
+  "num_slices": 3,
+  "shard_checkpoints": {
+    "0": "D:\\VIT\\Sem 5\\EDI\\Revamp CryptoForget\\data\\checkpoints\\shard_0_slice_2.pt",
+    "1": "D:\\VIT\\Sem 5\\EDI\\Revamp CryptoForget\\data\\checkpoints\\shard_1_slice_2.pt"
+  },
+  "manifest_hash": "28ae7b85826a3445982e3a3d1c37fcedf6ef084d4df83370d345d369ee9e4a68",
+  "validation_passed": true,
+  "promoted_at": "2026-11-03T16:09:02.719522+00:00",
+  "status": "active",
+  "previous_version": "v1.0.del-del_d214",
+  "extra_metadata": {
+    "deletion_request_id": "del_233ec9ed9c99",
+    "unlearned_records": [
+      "rec_2c5dcaee28ba"
+    ]
+  }
+}

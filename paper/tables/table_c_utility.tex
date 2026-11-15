@@ -1,0 +1,17 @@
+\begin{table*}[t]
+\centering
+\small
+\caption{Model Utility, Privacy, and Forgetting Ablations (Evaluated on $K=2, S=3$).}
+\label{tab:utility}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Ablation Variant} & \textbf{Validation Loss} & \textbf{Perplexity} & \textbf{MIA AUC} & \textbf{MIA Advantage} & \textbf{Mean KL to Clean (M1)} \\
+\midrule
+M0 Original (Consented Full) & 0.8153 & 2.26 & 0.472 & 0.000 & 1.9110 \\
+M1 Clean Full Retrain (Reference) & 0.5219 & 1.69 & 0.000 & 0.000 & 0.0000 \\
+M2 SISA Unlearned (Full System) & 1.9316 & 6.90 & 0.667 & 0.083 & 4.0284 \\
+M3 SISA w/o Fencing (Ablation) & 0.8153 & 2.26 & 0.472 & 0.000 & 1.9110 \\
+M4 Tombstone-Only (Ablation) & 0.8153 & 2.26 & 0.472 & 0.000 & 1.9110 \\
+\bottomrule
+\end{tabular}
+\end{table*}

@@ -1,0 +1,145 @@
+\documentclass[10pt,journal,compsoc]{IEEEtran}
+
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage{cite}
+\usepackage{microtype}
+
+\begin{document}
+
+\title{CryptoForget: Verifiable Machine Unlearning with SISA Sharding, Epoch-Fenced Pre-Tombstoning, and Merkle Deletion Certificates}
+
+\author{Student Research Group\\
+Department of Computer Science and Engineering\\
+Vishwakarma Institute of Technology, Pune, India}
+
+\IEEEtitleabstractindextext{%
+\begin{abstract}
+As generative conversational agents become ubiquitous, compliance with privacy regulations such as the General Data Protection Regulation (GDPR Article 17) requires robust mechanisms to enact the ``Right to be Forgotten.'' Standard data deletion purges records from relational datastores but fails to excise information embedded in parametric weights of fine-tuned language models. Retraining large neural models from scratch upon every deletion request is computationally prohibitive. In this paper, we present \textbf{CryptoForget}, an end-to-end privacy-preserving conversational AI platform that unites exact Sharded, Isolated, Sliced, and Aggregated (SISA) machine unlearning with cryptographic proof of deletion compliance. 
+
+CryptoForget delivers three core research contributions: (1) \textbf{RC1: Append-Only Merkle Deletion Transparency Log}, an RFC 6962--compliant Merkle tree maintaining cryptographic inclusion and consistency proofs without disclosing Personally Identifiable Information (PII); (2) \textbf{RC2: Epoch-Fenced Pre-Tombstoning Protocol}, which prevents concurrent training race conditions by enforcing atomic exclusion epochs and commit-time fencing tokens ($0$ post-request stale commits across empirical evaluations); and (3) \textbf{RC3: Cost-Aware SISA Configuration Selector}, which models initial training cost, unlearning latency, checkpoint storage, and logit-ensemble inference overhead to identify the multi-objective Pareto frontier. Evaluated on DistilGPT2 (82M parameters) under strict CPU hardware constraints, CryptoForget demonstrates a \textbf{6.62$\times$ unlearning speedup} (84.89\% retraining time saved) and breaks even against full clean retraining after only \textbf{1.7 to 3.9 deletion requests}, while maintaining tamper-evident verification latencies under 1.5 milliseconds.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Machine Unlearning, SISA, Data Privacy, Right to be Forgotten, Merkle Trees, Digital Signatures, Ed25519, Conversational AI, Concurrency Control.
+\end{IEEEkeywords}}
+
+\maketitle
+\IEEEdisplaynontitleabstractindextext
+\IEEEpeerreviewmaketitle
+
+\section{Introduction}
+\IEEEPARstart{T}{he} rapid adoption of conversational foundation models has introduced severe tensions between parametric memorization and individual privacy. Large Language Models (LLMs) trained or fine-tuned on user dialogues are prone to verbatim regurgitation and membership inference attacks (MIA)~\cite{carlini2021extracting,shokri2017membership}. While modern privacy frameworks like GDPR (Art. 17)~\cite{gdpr2016regulation} and CCPA mandate that users possess an irrevocable right to delete personal data, naive database deletion leaves learned model weights intact. 
+
+Conversely, executing a full clean retrain ($M1$) from scratch upon every deletion request is economically unsustainable and carbon-intensive~\cite{ginart2019making}. To reconcile efficiency with exact forgetting, Bourtoule et al.~\cite{bourtoule2021machine} introduced the Sharded, Isolated, Sliced, and Aggregated (SISA) training framework. SISA partitions data across $K$ independent shards and $S$ sequential slices, enabling targeted retraining of only the affected shard suffix upon data revocation.
+
+However, real-world deployment of SISA in interactive conversational systems faces three critical open challenges:
+\begin{enumerate}
+    \item \textbf{Verifiability Gap:} Users and regulatory auditors have no independent means to verify that a deletion workflow actually executed, leading to ungrounded trust in central platform assertions.
+    \item \textbf{Training-Job Race Conditions:} In distributed or queued training pipelines, a deletion request arriving while a worker is actively training a slice can result in the worker committing model weights containing tombstoned records, invalidating the unlearning guarantee.
+    \item \textbf{Multi-Objective Cost Trade-offs:} Selecting $K$ and $S$ is non-trivial; while larger $K$ and $S$ minimize unlearning latency, they exponentially inflate checkpoint storage and introduce inference latency overhead due to ensemble logit aggregation.
+\end{enumerate}
+
+To resolve these challenges, we present \textbf{CryptoForget}, a comprehensive architecture integrating SISA machine unlearning, deterministic lineage tracking, commit-time fencing tokens, Ed25519 signed deletion certificates, and an append-only Merkle transparency log.
+
+\section{Threat Model and Design Scope}
+\subsection{Trust Assumptions}
+We adopt an honest-but-curious platform operator model combined with potential external adversarial verifiers:
+\begin{itemize}
+    \item \textbf{Data Privacy:} Public verification endpoints and transparency logs must expose \textit{strictly zero PII}. No raw tokens, user IDs, or unhashed identifiers may ever appear in public certificates, Merkle leaves, or Signed Tree Heads (STH).
+    \item \textbf{Tamper Evidence:} Any retroactive modification of deletion records, revoked certificates, or invalid signatures must be detected with 100\% certainty by independent verifiers.
+    \item \textbf{Race Safety:} Concurrent deletion requests must prevent any training worker operating under an obsolete data snapshot from committing stale model checkpoints.
+\end{itemize}
+
+\subsection{Claims Boundary}
+In accordance with ethical engineering guidelines, CryptoForget makes a rigorous distinction between cryptographic authenticity and information-theoretic neural forgetting. An Ed25519 deletion certificate authenticates that a verifiable sequence of policy-enforced checks (source database purge, cache eviction, affected SISA suffix retraining, and model redeployment) was completed under a published policy version. It does \textit{not} constitute mathematical proof of zero residual Bayesian information in neural weights.
+
+\section{System Architecture}
+CryptoForget is structured into four cooperative planes:
+\begin{enumerate}
+    \item \textbf{Control \& Ingestion Plane:} Built on FastAPI and SQLite, enforcing strict opt-in training consent (defaulting to \texttt{OFF}). When consent is granted, deterministic lineage maps pseudonymous records to dataset versions, shards, and slices.
+    \item \textbf{Unlearning Engine:} Implements SISA sharding and slicing on DistilGPT2 (82M params) with PyTorch CPU-isolated threads, saving deterministic checkpoints at slice boundaries.
+    \item \textbf{Concurrency Gate (RC2):} Manages monotonically increasing exclusion epochs and worker leases. Workers validate epochs before data pre-read and at checkpoint commit time.
+    \item \textbf{Transparency \& Certification (RC1):} Assembles canonical RFC 8785 JSON manifests, generates Ed25519 signatures, appends events to an RFC 6962 Merkle log, and issues public verification URLs.
+\end{enumerate}
+
+\section{Cross-Cutting Research Contributions}
+
+\subsection{RC1: Append-Only Merkle Transparency Log}
+Drawing inspiration from Certificate Transparency (RFC 6962)~\cite{rfc6962}, CryptoForget logs all certificate issuance, revocation, and supersession events into an append-only Merkle tree. Leaf nodes commit strictly to:
+\begin{equation}
+\text{LeafHash} = \text{SHA-256}(0\text{x}00 \mathbin{\Vert} \text{CanonicalJSON}(c_{id}, ev, digest_{ev}, t))
+\end{equation}
+Internal nodes apply prefix domain separation:
+\begin{equation}
+\text{NodeHash} = \text{SHA-256}(0\text{x}01 \mathbin{\Vert} \text{LeftChild} \mathbin{\Vert} \text{RightChild})
+\end{equation}
+For any tree of size $N$, independent verifiers can validate membership via $O(\log N)$ inclusion proofs and verify historical immutability via consistency proofs.
+
+\subsection{RC2: Concurrency Fencing and Deletion-Race Barrier}
+To eliminate the window where a running worker publishes artifacts containing deleted records, CryptoForget introduces a two-phase fencing protocol:
+\begin{enumerate}
+    \item \textbf{Atomic Tombstoning:} Acceptance of a deletion request commits tombstones and increments the global $\text{ExclusionEpoch}$ within a single database transaction.
+    \item \textbf{Commit-Time Lease Validation:} Workers obtain a fencing token $F = \langle \text{epoch}, t_{\text{issued}}, \tau \rangle$. A commit attempt triggers:
+    \begin{equation}
+    \text{Validate}(F) = \begin{cases} 
+    \text{Commit Success}, & \text{if } F.\text{epoch} == \text{Epoch}_{\text{curr}} \land \Delta t \le \tau \\ 
+    \text{StaleJobFencingError}, & \text{otherwise} 
+    \end{cases}
+    \end{equation}
+\end{enumerate}
+
+\subsection{RC3: Cost-Aware SISA Configuration Selection}
+We model the complete lifecycle cost of SISA for $N$ deletion requests:
+\begin{equation}
+\text{TotalCost}(K, S, N) = T_{\text{init}}(K,S) + N \cdot T_{\text{del}}(K,S)
+\end{equation}
+The empirical break-even request count $N_{\text{break\_even}}$ relative to full retraining ($T_{\text{full}}$) is defined as:
+\begin{equation}
+N_{\text{break\_even}} = \frac{T_{\text{init}}(K,S)}{T_{\text{full}} - T_{\text{del}}(K,S)}
+\end{equation}
+Our multi-objective configuration selector computes the non-dominated Pareto frontier across deletion latency, initial training compute, storage footprint, and serving latency.
+
+\section{Experimental Evaluation}
+Experiments were executed on an Intel Core i5 12th Gen processor (16 GB RAM, 3 PyTorch CPU threads, batch size 1, max sequence length 128) using fine-tuned DistilGPT2.
+
+\input{tables/table_a_efficiency}
+\input{tables/table_b_resources}
+\input{tables/table_c_utility}
+\input{tables/table_d_security}
+\input{tables/table_pareto}
+
+\subsection{Efficiency and Break-Even Analysis (Table~\ref{tab:efficiency})}
+Table~\ref{tab:efficiency} summarizes retraining performance across five $(K, S)$ grid configurations. SISA $2\times2$ achieves a \textbf{6.62$\times$ speedup} and saves \textbf{84.89\%} of retraining time compared to full clean retraining ($M1$). Break-even request counts range from \textbf{1.7 requests} ($K=2, S=2$) to \textbf{8.4 requests} ($K=2, S=5$).
+
+\subsection{System Resources and Serving Latency (Table~\ref{tab:resources})}
+Process RSS remained bounded below 3.0 GiB across all configurations. However, logit-level ensemble aggregation across $K=4$ shards incurred an inference latency increase ($p_{95} \approx 2073$ ms) compared to a single model ($p_{95} = 25.15$ ms), highlighting the necessity of multi-objective Pareto analysis rather than optimizing unlearning latency in isolation.
+
+\subsection{Ablation Studies and Forgetting Effectiveness (Table~\ref{tab:utility})}
+We evaluate five ablation variants on $K=2, S=3$:
+\begin{itemize}
+    \item \textbf{M0 (Original):} Baseline model before deletion ($\text{Loss}=0.8153, \text{PPL}=2.26$).
+    \item \textbf{M1 (Clean Retrain):} Theoretical reference trained on retained data ($KL = 0$).
+    \item \textbf{M2 (SISA Unlearned):} Retrains only affected shard slices ($KL = 4.0284$, MIA Advantage drops to $0.083$).
+    \item \textbf{M3 (SISA w/o Fencing):} Shows that without commit-time fencing, concurrent unlearning fails to prevent stale parameter commitments.
+    \item \textbf{M4 (Tombstone-Only):} Demonstrates that data-plane exclusion alone does not induce model unlearning ($KL = 1.9110$).
+\end{itemize}
+
+\subsection{Cryptographic Integrity and Concurrency Benchmarks (Table~\ref{tab:security})}
+Over repeated empirical trials, commit-time fencing achieved a \textbf{100\% stale job rejection rate} with sub-millisecond barrier latency ($p_{95} = 0.033$ ms). The Merkle transparency log sustained sub-millisecond append times ($p_{95} = 0.606$ ms) and verified inclusion proofs in $0.119$ ms with 100\% detection of tampered records. Public verification disclosed zero PII across all audited fields.
+
+\subsection{Pareto Frontier Analysis (Table~\ref{tab:pareto})}
+Under a storage budget of 5.0 GiB and expected deletion volume $N=10$, the RC3 selector identified \textbf{$K=2, S=2$} as the uniquely non-dominated Pareto configuration, minimizing total lifecycle compute to $27.5$ seconds while bounding inference latency to $256.78$ ms.
+
+\section{Conclusion}
+CryptoForget bridges the gap between theoretical machine unlearning algorithms and operational privacy compliance in conversational AI. By integrating SISA sharding, commit-time epoch fencing, Ed25519 digital certificates, and an append-only Merkle transparency log, CryptoForget delivers provably auditable deletion workflows with minimal retraining overhead.
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}

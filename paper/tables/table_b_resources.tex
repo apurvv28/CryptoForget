@@ -1,0 +1,18 @@
+\begin{table*}[t]
+\centering
+\small
+\caption{System Resource Footprint: Memory, Swap, CPU Peak, Storage Footprint, and Serving Latency.}
+\label{tab:resources}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Method} & \textbf{Peak RSS (GiB)} & \textbf{Swap Peak (GiB)} & \textbf{CPU Peak (\%)} & \textbf{Checkpoints (GiB)} & \textbf{Inference $p_{50}$ (ms)} & \textbf{Inference $p_{95}$ (ms)} \\
+\midrule
+M1 Clean Full Retrain & 1.45 & 0.0 & 48.5\% & 0.305 & 21.40 & 25.15 \\
+SISA $2\times2$ & 1.69 & 0.0 & 100.0\% & 3.662 & 240.10 & 256.78 \\
+SISA $2\times3$ & 1.74 & 0.0 & 22.9\% & 5.493 & 450.32 & 471.26 \\
+SISA $4\times2$ & 2.89 & 0.0 & 16.4\% & 4.883 & 1880.45 & 1959.60 \\
+SISA $4\times3$ & 2.96 & 0.0 & 20.2\% & 7.324 & 2010.12 & 2073.33 \\
+SISA $2\times5$ & 2.82 & 0.0 & 35.1\% & 9.155 & 245.80 & 258.15 \\
+\bottomrule
+\end{tabular}
+\end{table*}

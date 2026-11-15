@@ -1,0 +1,47 @@
+# SISA experiment configuration for CryptoForget
+# Inherits from base_config.yaml and adds SISA-specific settings.
+
+experiment:
+  name: "sisa"
+  description: "SISA sharded training with selective unlearning"
+
+sisa:
+  # Configuration matrix (Doc 08 §10)
+  shard_counts: [2, 4]         # 8 only if resources allow
+  slice_counts: [2, 3, 5]
+  
+  # Per-experiment settings (chosen from matrix)
+  num_shards: 2
+  num_slices: 3
+  
+  # Partitioning
+  partition_seed: 42
+  partition_by: "user_id"      # Subject-level partitioning
+  
+  # Checkpoint policy
+  checkpoint_at_slice_boundaries: true
+  checkpoint_includes:
+    - model_state_dict
+    - optimizer_state_dict
+    - scheduler_state_dict
+    - rng_states
+    - data_manifest_hash
+    - code_revision
+
+deletion:
+  # Deletion test scenarios
+  positions: ["early", "middle", "late"]
+  affected_shard_fractions: [1]    # Number of shards affected
+  deletion_sizes: ["1_record", "1_percent", "5_percent"]
+  
+  # Tombstone settings
+  tombstone_epoch_start: 1
+
+aggregation:
+  method: "logit_average"
+  shard_weights: "uniform"
+
+cost_analysis:
+  compute_break_even: true
+  include_storage_cost: true
+  include_inference_overhead: true

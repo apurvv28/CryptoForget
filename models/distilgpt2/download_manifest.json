@@ -1,0 +1,29 @@
+{
+  "model_id": "distilbert/distilgpt2",
+  "local_path": "models\\distilgpt2",
+  "download_timestamp": "2026-11-03T14:28:53.699955+00:00",
+  "num_parameters": 81912576,
+  "license": "apache-2.0",
+  "files": {
+    "config.json": {
+      "size_bytes": 1106,
+      "sha256": "6211957e4812dc0cc24d88117b4d09e235a05634c5a80bf37fcb2f3a41bbf702"
+    },
+    "generation_config.json": {
+      "size_bytes": 125,
+      "sha256": "9c6468e5a401332b1010cde1561e0e26d6e12578f7cb1e5d9a8c31ef4f72e46c"
+    },
+    "model.safetensors": {
+      "size_bytes": 327657928,
+      "sha256": "721fa38acb2ba5d1ebdeed4bad3dcb32c0beeb2b924ecf544fffaa3b0bb65a66"
+    },
+    "tokenizer.json": {
+      "size_bytes": 3557680,
+      "sha256": "1fe93b6152957cf9cfd6d89002467f789ce8b3f3e000b3a2edf27c808ddd0b9e"
+    },
+    "tokenizer_config.json": {
+      "size_bytes": 328,
+      "sha256": "49e98b5fc5304952674ef40c64318939ce5bc9cd6e7de2dc56489b7e96a914f4"
+    }
+  }
+}

@@ -1,0 +1,1 @@
+"""CryptoForget Backend Application."""

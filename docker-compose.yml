@@ -1,0 +1,21 @@
+# Note: PostgreSQL and Redis are replaced with SQLite and AWS S3 respectively.
+# This docker-compose is optional and provides LocalStack for offline AWS S3 emulation if needed.
+
+version: "3.9"
+
+services:
+  localstack:
+    image: localstack/localstack:latest
+    container_name: cryptoforget-localstack-s3
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3
+      - DEFAULT_REGION=us-east-1
+    volumes:
+      - localstack_data:/var/lib/localstack
+    profiles:
+      - offline-test
+
+volumes:
+  localstack_data:

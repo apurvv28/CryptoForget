@@ -1,0 +1,72 @@
+{
+  "dataset_version": "v1.0-retained",
+  "manifest_hash": "e134f191dd4fbeb9847a7ba14955728cd338a54d87d83ee9dc0d059757e405f0",
+  "created_at": "2026-11-15T11:53:59.947261+00:00",
+  "total_records": 9,
+  "train_count": 3,
+  "val_count": 3,
+  "test_count": 3,
+  "subjects_count": 3,
+  "subjects": [
+    "user_bob",
+    "user_charlie",
+    "user_david"
+  ],
+  "records": [
+    {
+      "record_id": "rec_0003",
+      "user_id": "user_bob",
+      "text_hash": "98e2f46214a0aafbc01e89e26fe5756c9aeaa401521e18632802aa0106947311",
+      "text": "Bob says: The best machine learning conference for unlearning papers is IEEE S&P."
+    },
+    {
+      "record_id": "rec_0004",
+      "user_id": "user_bob",
+      "text_hash": "f8eee536627d86544ab3350fb5eff1de192f5c068cc72a36d79993ba32aab280",
+      "text": "Bob says: In python, always remember to set random seeds for deterministic results."
+    },
+    {
+      "record_id": "rec_0005",
+      "user_id": "user_bob",
+      "text_hash": "3a81a4c1ab8ac718609f3859565584d3784c1c45232807f6490b651b03ba3ea5",
+      "text": "Bob says: Distributed training across CPU shards requires careful gradient synchronization."
+    },
+    {
+      "record_id": "rec_0006",
+      "user_id": "user_charlie",
+      "text_hash": "b8f91394c52d1a01d059b103297c0b06e603bfe9944d41b94c6ee2e45e4e2707",
+      "text": "Charlie says: Differential privacy guarantees that individual sample presence is bounded."
+    },
+    {
+      "record_id": "rec_0007",
+      "user_id": "user_charlie",
+      "text_hash": "8259f56cc21a7d13f7fe28d32ffa416025eacd76692298c4ef64601c3b374f60",
+      "text": "Charlie says: Sharded models can be ensembled using output logit distributions."
+    },
+    {
+      "record_id": "rec_0008",
+      "user_id": "user_charlie",
+      "text_hash": "a87f622c349adce3655d042d5fba2196a4117d9549f507bbd0576cb19ebf11aa",
+      "text": "Charlie says: Verifiable certificates require Ed25519 digital signatures and Merkle trees."
+    },
+    {
+      "record_id": "rec_0009",
+      "user_id": "user_david",
+      "text_hash": "3836569e194c54075ae6d4fff6adc57294c07d082fb9cee1f00e596d0b79e0f4",
+      "text": "David says: Machine unlearning allows users to exercise their right to be forgotten."
+    },
+    {
+      "record_id": "rec_0010",
+      "user_id": "user_david",
+      "text_hash": "b7d41af0a90faeed62710f0061219734889409f536f31a0725d3e75f6bab0be5",
+      "text": "David says: SISA reduces retraining time by sharding datasets and saving slice checkpoints."
+    },
+    {
+      "record_id": "rec_0011",
+      "user_id": "user_david",
+      "text_hash": "9f05666e86ef5a0a9e55ff67347d5996cf00cf325637708e93698b50b6482c1c",
+      "text": "David says: Pre-tombstoning prevents training jobs from reading deleted records."
+    }
+  ],
+  "policy_version": "1.0"
+}

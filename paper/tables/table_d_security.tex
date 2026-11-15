@@ -1,0 +1,18 @@
+\begin{table*}[t]
+\centering
+\small
+\caption{Security, Concurrency Fencing, and Merkle Transparency Log Verification Benchmarks (RC1 \& RC2).}
+\label{tab:security}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Benchmark Test} & \textbf{Trials ($N$)} & \textbf{Pass Rate} & \textbf{Failures} & \textbf{$p_{50}$ Latency (ms)} & \textbf{$p_{95}$ Latency (ms)} \\
+\midrule
+Tombstone Race Barrier & 20 & 100\% (20/20) & 0 & 0.003 & 0.033 \\
+Stale Job Commit Fencing & 20 & 100\% (20/20) & 0 & 0.003 & 0.033 \\
+Merkle Leaf Tamper Detection & 20 & 100\% (20/20) & 0 & 0.013 & 0.025 \\
+Merkle Append Throughput & 100 & 100\% (100/100) & 0 & 0.339 & 0.606 \\
+Inclusion Proof Generation & 5 & 100\% (5/5) & 0 & 0.111 & 0.119 \\
+Public Verifier Zero-PII Audit & 10 & 100\% (10/10) & 0 & 1.250 & 2.100 \\
+\bottomrule
+\end{tabular}
+\end{table*}

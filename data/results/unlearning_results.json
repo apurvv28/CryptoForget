@@ -1,0 +1,35 @@
+{
+  "efficiency": {
+    "t_init_sisa_sec": 33.4,
+    "t_full_del_sec": 6.24,
+    "t_sisa_del_sec": 1.64,
+    "speedup": 3.81,
+    "time_saved_pct": 73.73,
+    "steps_full": 9,
+    "steps_sisa": 0,
+    "step_reduction_pct": 100.0,
+    "break_even_requests": 7.3
+  },
+  "evaluation": {
+    "deleted_targets": {
+      "original_loss": 0.6896,
+      "original_ppl": 1.99,
+      "unlearned_loss": 1.9511,
+      "unlearned_ppl": 7.04,
+      "clean_reference_loss": 0.7955,
+      "clean_reference_ppl": 2.22
+    },
+    "retained_utility": {
+      "original_loss": 0.8153,
+      "original_ppl": 2.26,
+      "unlearned_loss": 1.9316,
+      "unlearned_ppl": 6.9,
+      "clean_reference_loss": 0.5378,
+      "clean_reference_ppl": 1.71
+    },
+    "kl_to_clean_reference": 4.2991
+  },
+  "shards": 2,
+  "slices": 3,
+  "timestamp": 1794742416.6387231
+}

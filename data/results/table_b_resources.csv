@@ -1,0 +1,7 @@
+Method,Peak RSS (GiB),Swap peak (GiB),CPU peak (%),Disk/checkpoints (GiB),Inference p95 (ms)
+M1 Clean Full Retrain,1.45,0.0,48.5,0.305,47.88
+SISA 2x2,1.69,0.0,20.7,3.662,268.64
+SISA 2x3,1.74,0.0,13.0,5.493,266.43
+SISA 4x2,3.01,0.0,16.7,4.883,1377.76
+SISA 4x3,3.0,0.0,24.2,7.324,1474.6
+SISA 2x5,3.0,0.0,16.0,9.155,330.02

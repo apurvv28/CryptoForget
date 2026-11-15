@@ -1,0 +1,6 @@
+Method,Validation loss,Perplexity,MIA AUC,MIA advantage,Mean KL to clean retrain
+M0 Original,0.8153,2.26,0.472,0.0,1.911
+M1 Clean Full Retrain,0.5219,1.69,0.0,0.0,0.0
+M2 SISA Unlearned,1.9316,6.9,0.667,0.083,4.0284
+M3 SISA without Fencing,0.8153,2.26,0.472,0.0,1.911
+M4 Tombstone Only,0.8153,2.26,0.472,0.0,1.911

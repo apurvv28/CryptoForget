@@ -1,0 +1,16 @@
+{
+  "model_version": "v1.0.0-sisa-ensemble",
+  "model_type": "sisa_ensemble",
+  "num_shards": 2,
+  "num_slices": 3,
+  "shard_checkpoints": {
+    "0": "D:\\VIT\\Sem 5\\EDI\\Revamp CryptoForget\\data\\checkpoints\\shard_0_slice_2.pt",
+    "1": "D:\\VIT\\Sem 5\\EDI\\Revamp CryptoForget\\data\\checkpoints\\shard_1_slice_2.pt"
+  },
+  "manifest_hash": "manifest_sisa_123",
+  "validation_passed": true,
+  "promoted_at": "2026-11-03T15:47:41.145637+00:00",
+  "status": "active",
+  "previous_version": null,
+  "extra_metadata": {}
+}

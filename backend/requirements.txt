@@ -1,0 +1,44 @@
+# CryptoForget Backend Dependencies
+# NOTE: These are bootstrap versions. Pin exact versions in a lockfile
+# after testing compatibility (Doc 04 §1).
+
+# Web Framework
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+
+# Database (SQLite with async support)
+sqlalchemy[asyncio]
+alembic
+aiosqlite
+
+# Cloud Storage & Queue (AWS S3)
+boto3
+botocore
+
+# ML (PyTorch CPU — use official selector: https://pytorch.org/get-started/locally/)
+# torch  # Install separately via official CPU wheel command
+transformers
+datasets
+accelerate
+safetensors
+tokenizers
+
+# Cryptography
+cryptography
+
+# QR Code
+qrcode[pil]
+
+# Monitoring
+psutil
+
+# Auth
+python-jose[cryptography]
+passlib[bcrypt]
+
+# Testing
+pytest
+httpx
+pytest-asyncio

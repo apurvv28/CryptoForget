@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/components/chat/chatinterface.tsx","./src/components/chat/ui-reference.tsx","./src/components/deletion/deletionprogressmodal.tsx","./src/components/ui/button.tsx","./src/components/ui/textarea.tsx","./src/components/verification/publicverificationpage.tsx","./src/lib/utils.ts"],"version":"5.7.3"}

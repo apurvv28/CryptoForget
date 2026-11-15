@@ -1,0 +1,48 @@
+# Base experiment configuration for CryptoForget
+# All experiments inherit from this and override as needed.
+
+experiment:
+  name: "baseline"
+  description: "Full fine-tuning baseline on complete dataset"
+  seed: 42
+  seeds_for_final: [42, 123, 456]
+
+model:
+  id: "distilbert/distilgpt2"
+  local_path: "./models/distilgpt2"
+  revision: "main"  # Pin to specific commit hash before experiments
+
+training:
+  max_seq_length: 128
+  batch_size: 1
+  gradient_accumulation_steps: 1
+  learning_rate: 5.0e-5
+  weight_decay: 0.01
+  num_epochs: 3
+  warmup_steps: 100
+  fp32: true
+  max_wall_time_minutes: 60
+
+resource_limits:
+  max_rss_gb: 6.0
+  min_available_gb: 1.5
+  pytorch_threads: 3
+  pytorch_interop_threads: 1
+  dataloader_workers: 0
+  max_concurrent_training_jobs: 1
+
+dataset:
+  source: "TBD"  # To be selected in Phase 0
+  train_split: 0.8
+  val_split: 0.1
+  test_split: 0.1
+  subject_level_split: true
+
+evaluation:
+  eval_every_n_steps: 100
+  metrics:
+    - validation_loss
+    - perplexity
+    - inference_latency_p50
+    - inference_latency_p95
+    - peak_rss_gb

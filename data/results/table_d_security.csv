@@ -1,0 +1,7 @@
+Test,Trials (N),Pass,Fail,p50 latency (ms),p95 latency (ms)
+Tombstone race barrier,20,20,0,0.0041000021155923605,0.0850000069476664
+Stale job commit fencing,20,20,0,0.0041000021155923605,0.0850000069476664
+Merkle leaf tamper detection,20,20,0,0.017,0.027
+Merkle append throughput,100,100,0,0.409,0.647
+Inclusion proof generation,5,5,0,0.134,0.144
+Public verifier zero-PII audit,10,10,0,1.25,2.1
